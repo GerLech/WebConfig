@@ -8,34 +8,24 @@ If you start an AccessPoint, you can use WebConfig to edit access information fo
 
 ## Constants:
 
-maximum number of parameters
-
-**MAXVALUES 20**
-
-maximum number of options per parameters
-
-**MAXOPTIONS 15**
-
-name for the config file
-
+maximum number of parameters  **MAXVALUES 20**
+maximum number of options per parameters  **MAXOPTIONS 15**
+name for the config file  
 **CONFFILE "/WebConf.conf"**
-
-Type of HTML input fields
-
--INPUTTEXT 0       Simple text input
--INPUTPASSWORD 1   Password input showing stars
--INPUTNUMBER 2     Numeric input
--INPUTDATE 3       Date input
--INPUTTIME 4       Time input
--INPUTRANGE 5      Slider
--INPUTCHECKBOX 6   Checkbox
--INPUTRADIO 7      Radio buttons
--INPUTSELECT 8     Drop down list
--INPUTCOLOR 9      Color picker
+Type of HTML input fields  
+- INPUTTEXT 0       Simple text input
+- INPUTPASSWORD 1   Password input showing stars
+- INPUTNUMBER 2     Numeric input
+- INPUTDATE 3       Date input
+- INPUTTIME 4       Time input
+- INPUTRANGE 5      Slider
+- INPUTCHECKBOX 6   Checkbox
+- INPUTRADIO 7      Radio buttons
+- INPUTSELECT 8     Drop down list
+- INPUTCOLOR 9      Color picker
 
 ## Functions
-load form descriptions create the internal structure from JSON String
-
+load form descriptions create the internal structure from JSON String  
 **void setDescription(String parameter);**
 
 function to respond a HTTP request for the form use the filename
@@ -129,7 +119,7 @@ max	    Integer	(optional)  Maximalwert für Nummerneingaben
 options	Liste von Objekten	Liste der möglichen Optionen für Mehrfach-auswahl. Jeder Eintrag besteht aus einem Objekt mit den Eigenschaften v für den Wert und l für die Be-schriftung.
         (optional)
 
-Example defines a JSON String with all types of input fields
+#### Example defines a JSON String with all types of input fields  
 `
 String params = "["
   "{"
