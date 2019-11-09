@@ -1,0 +1,47 @@
+#######################################
+# Syntax Coloring Map For Ultrasound
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+WebConfig	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+setDescription	  KEYWORD2
+handleFormRequest	KEYWORD2
+getIndex	        KEYWORD2
+readConfig	      KEYWORD2
+writeConfig	      KEYWORD2
+deleteConfig	    KEYWORD2
+getString	        KEYWORD2
+getValue	        KEYWORD2
+getInt	          KEYWORD2
+getFloat	        KEYWORD2
+getBool	          KEYWORD2
+getApName	        KEYWORD2
+getCount	        KEYWORD2
+getName           KEYWORD2
+values            KEYWORDS2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MAXVALUES     LITERAL1
+MAXOPTIONS    LITERAL1
+CONFFILE      LITERAL1
+INPUTTEXT     LITERAL1
+INPUTPASSWORD LITERAL1
+INPUTNUMBER   LITERAL1
+INPUTDATE     LITERAL1
+INPUTTIME     LITERAL1
+INPUTRANGE    LITERAL1
+INPUTCHECKBOX LITERAL1
+INPUTRADIO    LITERAL1
+INPUTSELECT   LITERAL1
+INPUTCOLOR    LITERAL1
