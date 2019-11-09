@@ -9,29 +9,34 @@ If you start an AccessPoint, you can use WebConfig to edit access information fo
 ## Constants:
 
 maximum number of parameters
+
 **MAXVALUES 20**
 
 maximum number of options per parameters
-MAXOPTIONS 15
+
+**MAXOPTIONS 15**
 
 name for the config file
-CONFFILE "/WebConf.conf"
+
+**CONFFILE "/WebConf.conf"**
 
 Type of HTML input fields
-INPUTTEXT 0       Simple text input
-INPUTPASSWORD 1   Password input showing stars
-INPUTNUMBER 2     Numeric input
-INPUTDATE 3       Date input
-INPUTTIME 4       Time input
-INPUTRANGE 5      Slider
-INPUTCHECKBOX 6   Checkbox
-INPUTRADIO 7      Radio buttons
-INPUTSELECT 8     Drop down list
-INPUTCOLOR 9      Color picker
 
-Functions
+-INPUTTEXT 0       Simple text input
+-INPUTPASSWORD 1   Password input showing stars
+-INPUTNUMBER 2     Numeric input
+-INPUTDATE 3       Date input
+-INPUTTIME 4       Time input
+-INPUTRANGE 5      Slider
+-INPUTCHECKBOX 6   Checkbox
+-INPUTRADIO 7      Radio buttons
+-INPUTSELECT 8     Drop down list
+-INPUTCOLOR 9      Color picker
+
+## Functions
 load form descriptions create the internal structure from JSON String
-void setDescription(String parameter);
+
+**void setDescription(String parameter);**
 
 function to respond a HTTP request for the form use the filename
 to save.
@@ -125,7 +130,7 @@ options	Liste von Objekten	Liste der möglichen Optionen für Mehrfach-auswahl. 
         (optional)
 
 Example defines a JSON String with all types of input fields
-
+`
 String params = "["
   "{"
   "'name':'ssid',"
@@ -206,3 +211,4 @@ String params = "["
   "'default':'AM'"
   "}"
   "]";
+  `
