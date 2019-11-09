@@ -104,11 +104,13 @@ direkt access to the parameter values
 }\]  
 
 **name** String  
-Gibt den Namen des Parameters an. Mit diesem Namen wird der eingestellte Wert im Konfigurationsfile gespeichert. Über diesen Namen kann auch auf den Wert zugegriffen werden  
+ The name of the Parameter. This name will be used to save the parameter in the configuration file. It is also used to access the values.  
+ 
 **label** String  
-Definiert die Beschriftung des Eingabeelements im HTML Formular  
+Defines the label for the web form
+
 **type** Integer  
-Typ des Eingabeelements folgende Elemente sind möglich
+Type of the HTML input element
 -	INPUTTEXT Texteingabefeld
 -	INPUTPASSWORD Passwort Eingabefeld
 -	INPUTNUMBER Nummern Eingabefeld
@@ -119,94 +121,99 @@ Typ des Eingabeelements folgende Elemente sind möglich
 -	INPUTRADIO Mehrfachauswahl
 -	INPUTSELECT Mehrfachauswahl aus Dropdown-Liste
 -	INPUTCOLOR Farbauswahl
+
 **default**	String  
-Vorgabewert  
+default value  
+
 **min** Integer	(optional)  
-Minimalwert für Nummerneingaben  
+Minimum value for number input  
+
 **max**	    Integer	(optional)  
-Maximalwert für Nummerneingaben  
-**options**	Liste von Objekten (optional)	 
-Liste der möglichen Optionen für Mehrfach-auswahl. Jeder Eintrag besteht aus einem Objekt mit den Eigenschaften v für den Wert und l für die Beschriftung.  
+Maximum value for number input  
+
+**options**	List of objects (optional)	 
+A list to define options and values for multi select input fields  
+
 
 #### Example defines a JSON String with all types of input fields  
 
 String params = "\["  
   "{"  
   "'name':'ssid',"  
-  "'label':'Name des WLAN',"  
+  "'label':'WLAN name',"  
   "'type':"+String(INPUTTEXT)+","  
   "'default':''"  
   "},"  
   "{"  
   "'name':'pwd',"  
-  "'label':'WLAN Passwort',"  
+  "'label':'WLAN Password',"  
   "'type':"+String(INPUTPASSWORD)+","  
   "'default':''"  
   "},"  
   "{"  
   "'name':'amount',"  
-  "'label':'Menge',"  
+  "'label':'Amount',"  
   "'type':"+String(INPUTNUMBER)+","  
   "'min':-10,'max':20,"  
   "'default':'1'"  
   "},"  
   "{"  
   "'name':'float',"  
-  "'label':'Fließkomma Zahl',"  
+  "'label':'Floatingpoint number',"  
   "'type':"+String(INPUTTEXT)+","  
   "'default':'1.00'"  
   "},"  
   "{"  
   "'name':'duration',"  
-  "'label':'Dauer(s)',"  
+  "'label':'Duration (s)',"  
   "'type':"+String(INPUTRANGE)+","  
   "'min':5,'max':30,"  
   "'default':'10'"  
   "},"  
   "{"  
   "'name':'date',"  
-  "'label':'Datum',"  
+  "'label':'Date',"  
   "'type':"+String(INPUTDATE)+","  
   "'default':'2019-08-14'"  
   "},"  
   "{"  
   "'name':'time',"  
-  "'label':'Zeit',"  
+  "'label':'Time',"  
   "'type':"+String(INPUTTIME)+","  
   "'default':'18:30'"  
   "},"  
   "{"  
   "'name':'col',"  
-  "'label':'Farbe',"  
+  "'label':'Color',"  
   "'type':"+String(INPUTCOLOR)+","  
   "'default':'#ffffff'"  
   "},"  
   "{"  
   "'name':'switch',"  
-  "'label':'Schalter',"  
+  "'label':'Switch',"  
   "'type':"+String(INPUTCHECKBOX)+","  
   "'default':'1'"  
   "},"  
   "{"  
   "'name':'gender',"  
-  "'label':'Geschlecht',"  
+  "'label':'Gender',"  
   "'type':"+String(INPUTRADIO)+","  
   "'options':\["  
-  "{'v':'m','l':'männlich'},"  
-  "{'v':'w','l':'weiblich'},"  
-  "{'v':'x','l':'anderes'}\],"  
-  "'default':'w'"  
+  "{'v':'m','l':'male'},"  
+  "{'v':'f','l':'female'},"  
+  "{'v':'o','l':'other'}\],"  
+  "'default':'f'"  
   "},"  
   "{"  
   "'name':'continent',"  
-  "'label':'Kontinent',"  
+  "'label':'Continent',"  
   "'type':"+String(INPUTSELECT)+","  
   "'options':\["  
-  "{'v':'EU','l':'Europa'},"  
-  "{'v':'AF','l':'Afrika'},"  
-  "{'v':'AS','l':'Asien'},"  
-  "{'v':'AU','l':'Australien'},"  
-  "{'v':'AM','l':'Amerika'}\],"  
+  "{'v':'EU','l':'Europe'},"  
+  "{'v':'AF','l':'Africa'},"  
+  "{'v':'AS','l':'Asia'},"  
+  "{'v':'AU','l':'Australia'},"  
+  "{'v':'AM','l':'America'}\],"  
   "'default':'AM'"  
   "}"  
   "\]";  
