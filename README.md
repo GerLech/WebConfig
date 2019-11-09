@@ -131,7 +131,7 @@ Minimum value for number input
 **max**	    Integer	(optional)  
 Maximum value for number input  
 
-**options**	List of objects (optional)	 
+**options**	List of objects (optional)  
 A list to define options and values for multi select input fields  
 
 
