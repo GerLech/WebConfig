@@ -1,4 +1,4 @@
-WebConfig
+# WebConfig
 
 This Arduino Library works with ESP8266 and ESP32
 
@@ -6,10 +6,10 @@ It allows to edit configuration data by a web form. The configuration data will 
 The web form can be free formatted using JSON.
 If you start an AccessPoint, you can use WebConfig to edit access information for the local Network
 
-Constants:
+## Constants:
 
 maximum number of parameters
-MAXVALUES 20
+**MAXVALUES 20**
 
 maximum number of options per parameters
 MAXOPTIONS 15
