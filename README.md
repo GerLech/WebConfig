@@ -8,16 +8,16 @@ If you start an AccessPoint, you can use WebConfig to edit access information fo
 
 Constants:
 
-//maximum number of parameters
+maximum number of parameters
 MAXVALUES 20
 
-//maximum number of options per parameters
+maximum number of options per parameters
 MAXOPTIONS 15
 
-//name for the config file
+name for the config file
 CONFFILE "/WebConf.conf"
 
-//Type of HTML input fields
+Type of HTML input fields
 INPUTTEXT 0       Simple text input
 INPUTPASSWORD 1   Password input showing stars
 INPUTNUMBER 2     Numeric input
@@ -29,64 +29,64 @@ INPUTRADIO 7      Radio buttons
 INPUTSELECT 8     Drop down list
 INPUTCOLOR 9      Color picker
 
-//Functions
-//load form descriptions create the internal structure from JSON String
+Functions
+load form descriptions create the internal structure from JSON String
 void setDescription(String parameter);
 
-//function to respond a HTTP request for the form use the filename
-//to save.
+function to respond a HTTP request for the form use the filename
+to save.
 void handleFormRequest(WebServer * server, const char * filename);
 
-//function to respond a HTTP request for the form use the default filename
-//to save
+function to respond a HTTP request for the form use the default filename
+to save
 void handleFormRequest(WebServer * server);
 
-//get the index for a value by parameter name
+get the index for a value by parameter name
 int16_t getIndex(const char * name);
 
-//read configuration from file with filename
+read configuration from file with filename
 boolean readConfig(const char *  filename);
 
-//read configuration from file with default filename
+read configuration from file with default filename
 boolean readConfig();
 
-//write configuration to file with filename
+write configuration to file with filename
 boolean writeConfig(const char *  filename);
 
-//write configuration to file with default filename
+write configuration to file with default filename
 boolean writeConfig();
 
-//delete configuration  file with filename
+delete configuration  file with filename
 boolean deleteConfig(const char *  filename);
 
-//delete configutation file with default filename
+delete configutation file with default filename
 boolean deleteConfig();
 
-//get a parameter value as String by its name
+get a parameter value as String by its name
 const String getString(const char * name);
 
-//get a parameter value as pointer to character array by its name
+get a parameter value as pointer to character array by its name
 const char * getValue(const char * name);
 
-//get a parameter value as integer by its name
+get a parameter value as integer by its name
 const int getInt(const char * name);
 
-//get a parameter value as floating point number by its name
+get a parameter value as floating point number by its name
 const float getFloat(const char * name);
 
-//get a parameter value as boolean by its name
+get a parameter value as boolean by its name
 const boolean getBool(const char * name);
 
-//get the accesspoint name
+get the accesspoint name
 const char * getApName();
 
-//get the number of parameters
+get the number of parameters
 uint8_t getCount();
 
-//get the name of the parameter with index
+get the name of the parameter with index
 String getName(uint8_t index);
 
-//direkt access to the parameter values
+direkt access to the parameter values
 String values[MAXVALUES];
 
 Parameter definition with JSON
@@ -103,7 +103,8 @@ Parameter definition with JSON
 ]
 }]
 
-name	   String	            Gibt den Namen des Parameters an. Mit diesem Namen wird der eingestellte Wert im Konfigurationsfile gespeichert.
+name	   String	            Gibt den Namen des Parameters an. Mit diesem Namen wird der eingestellte Wert im 
+                            Konfigurationsfile gespeichert.
                             Über diesen Namen kann auch auf den Wert zugegriffen werden
 label	   String	            Definiert die Beschriftung des Eingabeelements im HTML Formular
 type	   Integer	          Typ des Eingabeelements folgende Elemente sind mög-lich
