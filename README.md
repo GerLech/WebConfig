@@ -106,19 +106,19 @@ direkt access to the parameter values
 **name** String  
 Gibt den Namen des Parameters an. Mit diesem Namen wird der eingestellte Wert im Konfigurationsfile gespeichert. Über diesen Namen kann auch auf den Wert zugegriffen werden  
 **label** String  
-Definiert die Beschriftung des Eingabeelements im HTML Formular
+Definiert die Beschriftung des Eingabeelements im HTML Formular  
 **type** Integer  
-Typ des Eingabeelements folgende Elemente sind mög-lich
-                            -	INPUTTEXT Texteingabefeld
-                            -	INPUTPASSWORD Passwort Eingabefeld
-                            -	INPUTNUMBER Nummern Eingabefeld
-                            -	INPUTDATE Datums Eingabefeld
-                            -	INPUTTIME Zeit Eingabefeld
-                            -	INPUTRANGE Slider zur Nummerneingabe
-                            -	INPUTCHECKBOX Ja/Nein Auswahl
-                            -	INPUTRADIO Mehrfachauswahl
-                            -	INPUTSELECT Mehrfachauswahl aus Dropdown-Liste
-                            -	INPUTCOLOR Farbauswahl
+Typ des Eingabeelements folgende Elemente sind möglich
+-	INPUTTEXT Texteingabefeld
+-	INPUTPASSWORD Passwort Eingabefeld
+-	INPUTNUMBER Nummern Eingabefeld
+-	INPUTDATE Datums Eingabefeld
+-	INPUTTIME Zeit Eingabefeld
+-	INPUTRANGE Slider zur Nummerneingabe
+-	INPUTCHECKBOX Ja/Nein Auswahl
+-	INPUTRADIO Mehrfachauswahl
+-	INPUTSELECT Mehrfachauswahl aus Dropdown-Liste
+-	INPUTCOLOR Farbauswahl
 **default**	String  
 Vorgabewert  
 **min** Integer	(optional)  
