@@ -21,7 +21,7 @@ Dependencies:
 
 #include <Arduino.h>
 #if defined(ESP32)
-  #include <Webserver.h>
+  #include <WebServer.h>
 #else
   #include <ESP8266WebServer.h>
 #endif
