@@ -27,6 +27,8 @@ Dependencies:
 #include <ArduinoJson.h>
 #include <FS.h>
 
+const char * inputtypes[] = {"text","password","number","date","time","range","check","radio","select","color","float"};
+
 //HTML templates
 //Template for header and begin of form
 const char HTML_START[] =
@@ -106,6 +108,11 @@ WebConfig::WebConfig() {
 };
 
 void WebConfig::setDescription(String parameter){
+  _count = 0;
+  addDescription(parameter);
+}
+
+void WebConfig::addDescription(String parameter){
   DeserializationError error;
   const int capacity = JSON_ARRAY_SIZE(MAXVALUES)
   + MAXVALUES*JSON_OBJECT_SIZE(6);
@@ -113,37 +120,52 @@ void WebConfig::setDescription(String parameter){
   char tmp[40];
   error = deserializeJson(doc,parameter);
   if (error ) {
+    Serial.println(parameter);
     Serial.print("JSON: ");
     Serial.println(error.c_str());
   } else {
     JsonArray array = doc.as<JsonArray>();
-    _count = array.size();
-    uint8_t i = 0;
     uint8_t j = 0;
     for (JsonObject obj : array) {
-      if (i<MAXVALUES) {
-        _description[i].optionCnt = 0;
-        strlcpy(_description[i].name,obj["name"],15);
-        strlcpy(_description[i].label,obj["label"],40);
-        _description[i].type = (obj.containsKey("type"))?obj["type"]:INPUTTEXT;
-        _description[i].max = (obj.containsKey("max"))?obj["max"] :100;
-        _description[i].min = (obj.containsKey("min"))?obj["min"] : 0;
-        strlcpy(tmp,obj["default"],30);
-        values[i] = String(tmp);
+      if (_count<MAXVALUES) {
+        _description[_count].optionCnt = 0;
+        if (obj.containsKey("name")) strlcpy(_description[_count].name,obj["name"],NAMELENGTH);
+        if (obj.containsKey("label"))strlcpy(_description[_count].label,obj["label"],LABELLENGTH);
+        if (obj.containsKey("type")) {
+          if (obj["type"].is<char *>()) {
+            uint8_t t = 0;
+            strlcpy(tmp,obj["type"],30);
+            while ((t<INPUTTYPES) && (strcmp(tmp,inputtypes[t])!=0)) t++;
+            if (t>INPUTTYPES) t = 0;
+            _description[_count].type = t;
+          } else {
+            _description[_count].type = obj["type"];
+          }
+        } else {
+          _description[_count].type = INPUTTEXT;
+        }
+        _description[_count].max = (obj.containsKey("max"))?obj["max"] :100;
+        _description[_count].min = (obj.containsKey("min"))?obj["min"] : 0;
+        if (obj.containsKey("default")) {
+          strlcpy(tmp,obj["default"],30);
+          values[_count] = String(tmp);
+        } else {
+          values[_count]="0";
+        }
         if (obj.containsKey("options")) {
           JsonArray opt = obj["options"].as<JsonArray>();
           j = 0;
           for (JsonObject o : opt) {
             if (j<MAXOPTIONS) {
-              _description[i].options[j] = o["v"].as<String>();
-              _description[i].labels[j] = o["l"].as<String>();
+              _description[_count].options[j] = o["v"].as<String>();
+              _description[_count].labels[j] = o["l"].as<String>();
             }
             j++;
           }
-          _description[i].optionCnt = opt.size();
+          _description[_count].optionCnt = opt.size();
         }
       }
-      i++;
+      _count++;
     }
 
   }
@@ -237,6 +259,7 @@ void addSelectOption(char * buf, String option, String label, String value) {
 
   for (uint8_t i = 0; i<_count; i++) {
     switch (_description[i].type) {
+      case INPUTFLOAT:
       case INPUTTEXT: createSimple(_buf,_description[i].name,_description[i].label,"text",values[i]);
         break;
       case INPUTPASSWORD: createSimple(_buf,_description[i].name,_description[i].label,"password",values[i]);
@@ -293,7 +316,7 @@ boolean WebConfig::readConfig(const char * filename){
     //if configfile does not exist write default values
     writeConfig(filename);
   }
-  File f = SPIFFS.open(CONFFILE,"r");
+  File f = SPIFFS.open(filename,"r");
   if (f) {
     Serial.println("Read configuration");
     uint32_t size = f.size();
@@ -330,7 +353,7 @@ boolean WebConfig::readConfig(){
 }
 //write configuration to file
 boolean WebConfig::writeConfig(const char * filename){
-  File f = SPIFFS.open(CONFFILE,"w");
+  File f = SPIFFS.open(filename,"w");
   if (f) {
     f.printf("apName=%s\n",_apName.c_str());
     for (uint8_t i = 0; i<_count; i++){
@@ -366,6 +389,32 @@ const String WebConfig::getString(const char * name) {
     return values[index];
   }
 }
+
+
+//Get results as a JSON string
+String WebConfig::getResults(){
+  char buffer[1024];
+  StaticJsonDocument<1000> doc;
+  for (uint8_t i = 0; i<_count; i++) {
+    switch (_description[i].type) {
+      case INPUTPASSWORD :
+      case INPUTSELECT :
+      case INPUTDATE :
+      case INPUTTIME :
+      case INPUTRADIO :
+      case INPUTCOLOR :
+      case INPUTTEXT : doc[_description[i].name] = values[i]; break;
+      case INPUTCHECKBOX :
+      case INPUTRANGE :
+      case INPUTNUMBER : doc[_description[i].name] = values[i].toInt(); break;
+      case INPUTFLOAT : doc[_description[i].name] = values[i].toFloat(); break;
+
+    }
+  }
+  serializeJson(doc,buffer);
+  return String(buffer);
+}
+
 
 const char * WebConfig::getValue(const char * name){
   int16_t index;
@@ -405,4 +454,76 @@ String WebConfig::getName(uint8_t index){
   } else {
     return "";
   }
+}
+
+//set the value for a parameter
+void WebConfig::setValue(const char*name,String value){
+  int16_t i = getIndex(name);
+  if (i>=0) values[i] = value;
+}
+
+//set the label for a parameter
+void WebConfig::setLabel(const char * name, const char* label){
+  int16_t i = getIndex(name);
+  if (i>=0) strlcpy(_description[i].label,label,LABELLENGTH);
+}
+
+//remove all options
+void WebConfig::clearOptions(uint8_t index){
+  if (index < _count) _description[index].optionCnt = 0;
+}
+
+void WebConfig::clearOptions(const char * name){
+  int16_t i = getIndex(name);
+  if (i >= 0) clearOptions(i);
+}
+
+//add a new option
+void WebConfig::addOption(uint8_t index, String option){
+  addOption(index,option,option);
+}
+
+void WebConfig::addOption(uint8_t index, String option, String label){
+  if (index < _count) {
+    if (_description[index].optionCnt < MAXOPTIONS) {
+      _description[index].options[_description[index].optionCnt]=option;
+      _description[index].labels[_description[index].optionCnt]=label;
+      _description[index].optionCnt++;
+    }
+  }
+}
+
+//modify an option
+void WebConfig::setOption(uint8_t index, uint8_t option_index, String option, String label){
+  if (index < _count) {
+    if (option_index < _description[index].optionCnt) {
+      _description[index].options[option_index] = option;
+      _description[index].labels[option_index] = label;
+    }
+  }
+
+}
+
+void WebConfig::setOption(char * name, uint8_t option_index, String option, String label){
+  int16_t i = getIndex(name);
+  if (i >= 0) setOption(i,option_index,option,label);
+}
+
+//get the options count
+uint8_t WebConfig::getOptionCount(uint8_t index){
+  if (index < _count) {
+    return _description[index].optionCnt;
+  } else {
+    return 0;
+  }
+}
+
+uint8_t WebConfig::getOptionCount(char * name){
+  int16_t i = getIndex(name);
+  if (i >= 0) {
+    return getOptionCount(i);
+  } else {
+    return 0;
+  }
+
 }

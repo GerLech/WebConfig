@@ -32,6 +32,10 @@ Dependencies:
 //maximum number of options per parameters
 #define MAXOPTIONS 15
 
+//character limits
+#define NAMELENGTH 20
+#define LABELLENGTH 40
+
 //name for the config file
 #define CONFFILE "/WebConf.conf"
 
@@ -45,12 +49,15 @@ Dependencies:
 #define INPUTRADIO 7
 #define INPUTSELECT 8
 #define INPUTCOLOR 9
+#define INPUTFLOAT 10
+//number of types
+#define INPUTTYPES 11
 
 //data structure to hold the parameter Description
 typedef //Struktur eines Datenpakets
 struct  {
-  char name[15];
-  char label[30];
+  char name[NAMELENGTH];
+  char label[LABELLENGTH];
   uint8_t type;
   int min;
   int max;
@@ -64,6 +71,8 @@ public:
   WebConfig();
   //load form descriptions
   void setDescription(String parameter);
+  //Add extra descriptions
+  void addDescription(String parameter);
   //function to respond a HTTP request for the form use the filename
   //to save.
 #if defined(ESP32)
@@ -104,6 +113,24 @@ public:
   uint8_t getCount();
   //get the name of a parameter
   String getName(uint8_t index);
+  //Get results as a JSON string
+  String getResults();
+  //set the value for a parameter
+  void setValue(const char*name,String value);
+  //set the label for a parameter
+  void setLabel(const char * name, const char* label);
+  //remove all options
+  void clearOptions(uint8_t index);
+  void clearOptions(const char * name);
+  //add a new option
+  void addOption(uint8_t index, String option);
+  void addOption(uint8_t index, String option, String label);
+  //modify an option
+  void setOption(uint8_t index, uint8_t option_index, String option, String label);
+  void setOption(char * name, uint8_t option_index, String option, String label);
+  //get the options count
+  uint8_t getOptionCount(uint8_t index);
+  uint8_t getOptionCount(char * name);
   //values for the parameter
   String values[MAXVALUES];
 private:
