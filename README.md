@@ -32,6 +32,7 @@ Type of HTML input fields
 ## Functions
 
 **void setDescription(String parameter);**
+
 load form descriptions create the internal structure from JSON String, delete existing entries
 
 **void addDescription(String parameter);**
@@ -132,16 +133,16 @@ returns the number of options in the selection field with name name
 **void setButtons(uint8 buttons);**
 set the type of form. With BTN_CONFIG (0) the configuration mode will be set. This form is typical used to setup WiFi access. The form has two buttons "SAVE" and "RESTART". Modifications will be saved to SPIFFS automatically. With BTN_DONE (1), BTN_CANCEL (2) and BTN_DELETE (4) simple forms will be shown, without automatic saving. The form gets the specified Buttons. The buttons can be combined. So BTN_DONE+BTN_CANCEL+BTN_DELETE shows all three buttons. To react on button clicks, callback functions can be registered.
 
-**void registerOnSave(void (*callback)(String results));**
+**void registerOnSave(void (* callback)(String results));**
 this function will be called after the "SAVE" button was clicked. The parameter results holds a JSON formatted string with the values from all fields.
 
-**void registerOnDone(void (*callback)(String results));**
+**void registerOnDone(void (* callback)(String results));**
 this function will be called after the "DONE" button was clicked. The parameter results holds a JSON formatted string with the values from all fields.
 
-**void registerOnCancel(void (*callback)());**
+**void registerOnCancel(void (* callback)());**
 this function will be called after the "CANCEL" button was clicked.
 
-**void registerOnDelete(void (*callback)(String name));**
+**void registerOnDelete(void (* callback)(String name));**
 this function will be called after the "DELETE" button was clicked. The parameter name holds the value of the field named "name" if such a field exists.
 
 ## Parameter definition with JSON
