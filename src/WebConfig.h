@@ -1,7 +1,7 @@
 /*
 
 File WebConfig.h
-Version 0.1
+Version 1.3
 Author Gerald Lechner
 contakt lechge@gmail.com
 
@@ -53,6 +53,10 @@ Dependencies:
 //number of types
 #define INPUTTYPES 11
 
+#define BTN_CONFIG 0
+#define BTN_DONE 1
+#define BTN_CANCEL 2
+#define BTN_DELETE 4
 //data structure to hold the parameter Description
 typedef //Struktur eines Datenpakets
 struct  {
@@ -115,6 +119,8 @@ public:
   String getName(uint8_t index);
   //Get results as a JSON string
   String getResults();
+  //Ser values from a JSON string
+  void setValues(String json);
   //set the value for a parameter
   void setValue(const char*name,String value);
   //set the label for a parameter
@@ -131,13 +137,29 @@ public:
   //get the options count
   uint8_t getOptionCount(uint8_t index);
   uint8_t getOptionCount(char * name);
+  //set form type to doen cancel
+  void setButtons(uint8 buttons);
+  //register onSave callback
+  void registerOnSave(void (*callback)(String results));
+  //register onSave callback
+  void registerOnDone(void (*callback)(String results));
+  //register onSave callback
+  void registerOnCancel(void (*callback)());
+  //register onSave callback
+  void registerOnDelete(void (*callback)(String name));
+
   //values for the parameter
   String values[MAXVALUES];
 private:
   char _buf[1000];
   uint8_t _count;
   String _apName;
+  uint8_t _buttons = BTN_CONFIG;
   DESCRIPTION _description[MAXVALUES];
+  void (*_onSave)(String results) = NULL;
+  void (*_onDone)(String results) = NULL;
+  void (*_onCancel)() = NULL;
+  void (*_onDelete)(String name) = NULL;
 };
 
 #endif

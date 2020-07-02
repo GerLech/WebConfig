@@ -1,7 +1,7 @@
 /*
 
 File WebConfig.h
-Version 0.1
+Version 1.3
 Author Gerald Lechner
 contakt lechge@gmail.com
 
@@ -94,7 +94,7 @@ const char HTML_ENTRY_SELECT_OPTION[] =
 const char HTML_ENTRY_SELECT_END[] =
 " </select></div>\n";
 
-//Template for save button and end of the form
+//Template for save button and end of the form with save
 const char HTML_END[] =
 "<div class='zeile'><button type='submit' name='SAVE'>Save</button>\n"
 "<button type='submit' name='RST'>Restart</button></div>\n"
@@ -102,6 +102,9 @@ const char HTML_END[] =
 "</div>\n"
 "</body>\n"
 "</html>\n";
+//Template for save button and end of the form without save
+const char HTML_BUTTON[] =
+"<button type='submit' name='%s'>%s</button>\n";
 
 WebConfig::WebConfig() {
   _apName = "";
@@ -251,53 +254,90 @@ void addSelectOption(char * buf, String option, String label, String value) {
       if (server->hasArg("RST")) ESP.restart();
     }
   }
-  server->setContentLength(CONTENT_LENGTH_UNKNOWN);
-  sprintf(_buf,HTML_START,_apName.c_str());
-  server->send(200, "text/html", _buf);
-  createSimple(_buf,"apName","Name des Accesspoints","text",_apName);
-  server->sendContent(_buf);
-
-  for (uint8_t i = 0; i<_count; i++) {
-    switch (_description[i].type) {
-      case INPUTFLOAT:
-      case INPUTTEXT: createSimple(_buf,_description[i].name,_description[i].label,"text",values[i]);
-        break;
-      case INPUTPASSWORD: createSimple(_buf,_description[i].name,_description[i].label,"password",values[i]);
-        break;
-      case INPUTDATE: createSimple(_buf,_description[i].name,_description[i].label,"date",values[i]);
-        break;
-      case INPUTTIME: createSimple(_buf,_description[i].name,_description[i].label,"time",values[i]);
-        break;
-      case INPUTCOLOR: createSimple(_buf,_description[i].name,_description[i].label,"color",values[i]);
-        break;
-      case INPUTNUMBER: createNumber(_buf,_description[i],values[i]);
-        break;
-      case INPUTRANGE: createRange(_buf,_description[i],values[i]);
-        break;
-      case INPUTCHECKBOX: createCheckbox(_buf,_description[i],values[i]);
-        break;
-      case INPUTRADIO: sprintf(_buf,HTML_ENTRY_RADIO_TITLE,_description[i].label);
-        for (uint8_t j = 0 ; j<_description[i].optionCnt; j++) {
-          server->sendContent(_buf);
-          createRadio(_buf,_description[i],values[i],j);
-        }
-        break;
-      case INPUTSELECT: startSelect(_buf,_description[i]);
-        for (uint8_t j = 0 ; j<_description[i].optionCnt; j++) {
-          server->sendContent(_buf);
-          addSelectOption(_buf,_description[i].options[j],_description[i].labels[j],values[i]);
-        }
-        server->sendContent(_buf);
-        strcpy(_buf,HTML_ENTRY_SELECT_END);
-        break;
-      default : _buf[0] = 0;
-        break;
-
-    }
-    server->sendContent(_buf);
+  boolean exit = false;
+  if (server->hasArg("SAVE") && _onSave) {
+    _onSave(getResults());
+    exit = true;
   }
+  if (server->hasArg("DONE") && _onDone) {
+    _onDone(getResults());
+    exit = true;
+  }
+  if (server->hasArg("CANCEL") && _onCancel) {
+    _onCancel();
+    exit = true;
+  }
+  if (server->hasArg("DELETE") && _onDelete) {
+    _onDelete(_apName);
+    exit = true;
+  }
+  if (!exit) {
+    server->setContentLength(CONTENT_LENGTH_UNKNOWN);
+    sprintf(_buf,HTML_START,_apName.c_str());
+    server->send(200, "text/html", _buf);
+    if (_buttons == BTN_CONFIG) {
+      createSimple(_buf,"apName","Name des Accesspoints","text",_apName);
+      server->sendContent(_buf);
+    }
 
-  server->sendContent(HTML_END);
+    for (uint8_t i = 0; i<_count; i++) {
+      switch (_description[i].type) {
+        case INPUTFLOAT:
+        case INPUTTEXT: createSimple(_buf,_description[i].name,_description[i].label,"text",values[i]);
+          break;
+        case INPUTPASSWORD: createSimple(_buf,_description[i].name,_description[i].label,"password",values[i]);
+          break;
+        case INPUTDATE: createSimple(_buf,_description[i].name,_description[i].label,"date",values[i]);
+          break;
+        case INPUTTIME: createSimple(_buf,_description[i].name,_description[i].label,"time",values[i]);
+          break;
+        case INPUTCOLOR: createSimple(_buf,_description[i].name,_description[i].label,"color",values[i]);
+          break;
+        case INPUTNUMBER: createNumber(_buf,_description[i],values[i]);
+          break;
+        case INPUTRANGE: createRange(_buf,_description[i],values[i]);
+          break;
+        case INPUTCHECKBOX: createCheckbox(_buf,_description[i],values[i]);
+          break;
+        case INPUTRADIO: sprintf(_buf,HTML_ENTRY_RADIO_TITLE,_description[i].label);
+          for (uint8_t j = 0 ; j<_description[i].optionCnt; j++) {
+            server->sendContent(_buf);
+            createRadio(_buf,_description[i],values[i],j);
+          }
+          break;
+        case INPUTSELECT: startSelect(_buf,_description[i]);
+          for (uint8_t j = 0 ; j<_description[i].optionCnt; j++) {
+            server->sendContent(_buf);
+            addSelectOption(_buf,_description[i].options[j],_description[i].labels[j],values[i]);
+          }
+          server->sendContent(_buf);
+          strcpy(_buf,HTML_ENTRY_SELECT_END);
+          break;
+        default : _buf[0] = 0;
+          break;
+
+      }
+      server->sendContent(_buf);
+    }
+    if (_buttons == BTN_CONFIG) {
+      server->sendContent(HTML_END);
+    } else {
+      server->sendContent("<div class='zeile'>\n");
+      if ((_buttons & BTN_DONE) == BTN_DONE) {
+        sprintf(_buf,HTML_BUTTON,"DONE","Done");
+        server->sendContent(_buf);
+      }
+      if ((_buttons & BTN_CANCEL) == BTN_CANCEL) {
+        sprintf(_buf,HTML_BUTTON,"CANCEL","Cancel");
+        server->sendContent(_buf);
+      }
+      if ((_buttons & BTN_DELETE) == BTN_DELETE) {
+        sprintf(_buf,HTML_BUTTON,"DELETE","Delete");
+        server->sendContent(_buf);
+      }
+      server->sendContent("</div></form></div></body></html>\n");
+    }
+  }
 }
 //get the index for a value by parameter name
 int16_t WebConfig::getIndex(const char * name){
@@ -415,6 +455,42 @@ String WebConfig::getResults(){
   return String(buffer);
 }
 
+//Ser values from a JSON string
+void WebConfig::setValues(String json){
+  int val;
+  float fval;
+  char sval[255];
+  DeserializationError error;
+  StaticJsonDocument<1000> doc;
+  error = deserializeJson(doc, json);
+  if (error ) {
+    Serial.print("JSON: ");
+    Serial.println(error.c_str());
+  } else {
+    for (uint8_t i = 0; i<_count; i++) {
+      if (doc.containsKey(_description[i].name)){
+        switch (_description[i].type) {
+          case INPUTPASSWORD :
+          case INPUTSELECT :
+          case INPUTDATE :
+          case INPUTTIME :
+          case INPUTRADIO :
+          case INPUTCOLOR :
+          case INPUTTEXT : strlcpy(sval,doc[_description[i].name],255);
+            values[i] = String(sval); break;
+          case INPUTCHECKBOX :
+          case INPUTRANGE :
+          case INPUTNUMBER : val = doc[_description[i].name];
+            values[i] = String(val); break;
+          case INPUTFLOAT : fval = doc[_description[i].name];
+            values[i] = String(fval); break;
+
+        }
+      }
+    }
+  }
+}
+
 
 const char * WebConfig::getValue(const char * name){
   int16_t index;
@@ -526,4 +602,25 @@ uint8_t WebConfig::getOptionCount(char * name){
     return 0;
   }
 
+}
+
+//set form type to doen cancel
+void WebConfig::setButtons(uint8_t buttons){
+  _buttons = buttons;
+}
+//register onSave callback
+void WebConfig::registerOnSave(void (*callback)(String results)){
+  _onSave = callback;
+}
+//register onSave callback
+void WebConfig::registerOnDone(void (*callback)(String results)){
+  _onDone = callback;
+}
+//register onSave callback
+void WebConfig::registerOnCancel(void (*callback)()){
+  _onCancel = callback;
+}
+//register onDelete callback
+void WebConfig::registerOnDelete(void (*callback)(String name)){
+  _onDelete = callback;
 }
