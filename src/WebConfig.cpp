@@ -22,7 +22,7 @@ Dependencies:
   #include "SPIFFS.h"
   #include <WebServer.h>
 #else
-  #include <ESP8266Webserver.h>
+  #include <ESP8266WebServer.h>
 #endif
 #include <ArduinoJson.h>
 #include <FS.h>
