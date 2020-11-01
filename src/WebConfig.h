@@ -138,7 +138,7 @@ public:
   uint8_t getOptionCount(uint8_t index);
   uint8_t getOptionCount(char * name);
   //set form type to doen cancel
-  void setButtons(uint8 buttons);
+  void setButtons(uint8_t buttons);
   //register onSave callback
   void registerOnSave(void (*callback)(String results));
   //register onSave callback
