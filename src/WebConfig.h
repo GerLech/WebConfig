@@ -1,7 +1,7 @@
 /*
 
 File WebConfig.h
-Version 1.3
+Version 1.3.2
 Author Gerald Lechner
 contakt lechge@gmail.com
 
