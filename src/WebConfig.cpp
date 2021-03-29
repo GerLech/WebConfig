@@ -1,7 +1,7 @@
 /*
 
-File WebConfig.h
-Version 1.3
+File WebConfig.cpp
+Version 1.3.2
 Author Gerald Lechner
 contakt lechge@gmail.com
 
@@ -22,7 +22,7 @@ Dependencies:
   #include "SPIFFS.h"
   #include <WebServer.h>
 #else
-  #include <ESP8266WebServer.h>
+  #include <ESP8266Webserver.h>
 #endif
 #include <ArduinoJson.h>
 #include <FS.h>
@@ -49,11 +49,11 @@ const char HTML_START[] =
 ".titel {\n"
 "font-weight:bold;\n"
 "text-align:center;\n"
-"width:100%;\n"
+"width:100%%;\n"
 "padding:5px;\n"
 "}\n"
 ".zeile {\n"
-"  width:100%;\n"
+"  width:100%%;\n"
 "  padding:5px;\n"
 "  text-align: center;\n"
 "}\n"
@@ -365,7 +365,7 @@ boolean WebConfig::readConfig(const char * filename){
       pos = line.indexOf('=');
       name = line.substring(0,pos);
       value = line.substring(pos+1);
-      if (name == "apName") {
+      if ((name == "apName") && (value != "")) {
         _apName = value;
         Serial.println(line);
       } else {
