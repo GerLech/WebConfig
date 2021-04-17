@@ -28,6 +28,10 @@ Type of HTML input fields
 - INPUTRADIO 7      Radio buttons
 - INPUTSELECT 8     Drop down list
 - INPUTCOLOR 9      Color picker
+- INPUTFLOAT 10     Floatingpoint number
+- INPUTTEXTAREA 11  Text area with multiple lines
+- INPUTMULTICHECK 12 Fieldset with multiple checkboxes. The result string has one character
+0 or 1 for every option. 010010 means there are 6 options and option 2 nand 5 are true
 
 ## Functions
 
@@ -213,18 +217,21 @@ Type of the HTML input element
 -	INPUTRADIO Mehrfachauswahl
 -	INPUTSELECT Mehrfachauswahl aus Dropdown-Liste
 -	INPUTCOLOR Farbauswahl
+- INPUTFLOAT Fließkommazahl
+- INPUTTEXTAREA Mehrzeiliges Textfeld
+- INPUTMULTICHECK Mehrere Checkboxen
 
 **default**	String  
 default value  
 
 **min** Integer	(optional)  
-Minimum value for number input  
+Minimum value for number input  or columns for test area
 
 **max**	    Integer	(optional)  
-Maximum value for number input  
+Maximum value for number input  or rows for text area
 
 **options**	List of objects (optional)  
-A list to define options and values for multi select input fields  
+A list to define options and values for multi select input fields  on multi checkboxes the option name is used as label
 
 
 #### Example defines a JSON String with all types of input fields  
@@ -236,6 +243,13 @@ String params = "\["
   "'type':"+String(INPUTTEXT)+","  
   "'default':''"  
   "},"  
+  "{"
+  "'name':'area',"
+  "'label':'Textarea',"
+  "'type':"+String(INPUTTEXTAREA)+","
+  "'default':'',"
+  "'min':40,'max':5"  //min = columns max = rows
+  "},"
   "{"  
   "'name':'pwd',"  
   "'label':'WLAN Password',"  
@@ -307,5 +321,19 @@ String params = "\["
   "{'v':'AU','l':'Australia'},"  
   "{'v':'AM','l':'America'}\],"  
   "'default':'AM'"  
-  "}"  
-  "\]";  
+  "},"  
+  "{"
+"'name':'wochentag',"
+"'label':'Wochentag',"
+"'type':"+String(INPUTMULTICHECK)+","
+"'options':["
+"{'v':'0','l':'Sonntag'},"
+"{'v':'1','l':'Montag'},"
+"{'v':'2','l':'Dienstag'},"
+"{'v':'3','l':'Mittwoch'},"
+"{'v':'4','l':'Donnerstag'},"
+"{'v':'5','l':'Freitag'},"
+"{'v':'6','l':'Samstag'}],"
+"'default':''"
+"}"
+"\]";  
