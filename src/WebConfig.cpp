@@ -1,7 +1,7 @@
 /*
 
 File WebConfig.cpp
-Version 1.3.2
+Version 1.4
 Author Gerald Lechner
 contakt lechge@gmail.com
 
@@ -22,7 +22,7 @@ Dependencies:
   #include "SPIFFS.h"
   #include <WebServer.h>
 #else
-  #include <ESP8266Webserver.h>
+  #include <ESP8266WebServer.h>
 #endif
 #include <ArduinoJson.h>
 #include <FS.h>
@@ -31,7 +31,7 @@ const char * inputtypes[] = {"text","password","number","date","time","range","c
 
 //HTML templates
 //Template for header and begin of form
-const char HTML_START[] =
+const char HTML_START[] PROGMEM =
 "<!DOCTYPE HTML>\n"
 "<html lang='de'>\n"
 "<head>\n"
@@ -71,31 +71,41 @@ const char HTML_START[] =
 "<form method='post'>\n";
 
 //Template for one input field
-const char HTML_ENTRY_SIMPLE[] =
+const char HTML_ENTRY_SIMPLE[] PROGMEM =
 "  <div class='zeile'><b>%s</b></div>\n"
-"  <div class='zeile'><input type='%s' value='%s' name='%s' \></div>\n";
-const char HTML_ENTRY_NUMBER[] =
+"  <div class='zeile'><input type='%s' value='%s' name='%s'></div>\n";
+const char HTML_ENTRY_AREA[] PROGMEM =
 "  <div class='zeile'><b>%s</b></div>\n"
-"  <div class='zeile'><input type='number' min='%i' max='%i' value='%s' name='%s' \></div>\n";
-const char HTML_ENTRY_RANGE[] =
+"  <div class='zeile'><textarea rows='%i' cols='%i' name='%s'>%s</textarea></div>\n";
+const char HTML_ENTRY_NUMBER[] PROGMEM =
 "  <div class='zeile'><b>%s</b></div>\n"
-"  <div class='zeile'>%i&nbsp;<input type='range' min='%i' max='%i' value='%s' name='%s' \>&nbsp;%i</div>\n";
-const char HTML_ENTRY_CHECKBOX[] =
-"  <div class='zeile'><b>%s</b><input type='checkbox' %s name='%s' \></div>\n";
-const char HTML_ENTRY_RADIO_TITLE[] =
+"  <div class='zeile'><input type='number' min='%i' max='%i' value='%s' name='%s'></div>\n";
+const char HTML_ENTRY_RANGE[] PROGMEM =
+"  <div class='zeile'><b>%s</b></div>\n"
+"  <div class='zeile'>%i&nbsp;<input type='range' min='%i' max='%i' value='%s' name='%s'>&nbsp;%i</div>\n";
+const char HTML_ENTRY_CHECKBOX[] PROGMEM =
+"  <div class='zeile'><b>%s</b><input type='checkbox' %s name='%s'></div>\n";
+const char HTML_ENTRY_RADIO_TITLE[] PROGMEM =
 " <div class='zeile'><b>%s</b></div>\n";
 const char HTML_ENTRY_RADIO[] =
 "  <div class='zeile'><input type='radio' name='%s' value='%s' %s>%s</div>\n";
-const char HTML_ENTRY_SELECT_START[] =
+const char HTML_ENTRY_SELECT_START[] PROGMEM =
 " <div class='zeile'><b>%s</b></div>\n"
 " <div class='zeile'><select name='%s'>\n";
-const char HTML_ENTRY_SELECT_OPTION[] =
+const char HTML_ENTRY_SELECT_OPTION[] PROGMEM =
 "  <option value='%s' %s>%s</option>\n";
-const char HTML_ENTRY_SELECT_END[] =
+const char HTML_ENTRY_SELECT_END[] PROGMEM =
 " </select></div>\n";
+const char HTML_ENTRY_MULTI_START[] PROGMEM =
+" <div class='zeile'><b>%s</b></div>\n"
+" <div class='zeile'><fieldset style='text-align:left;'>\n";
+const char HTML_ENTRY_MULTI_OPTION[] PROGMEM =
+"  <input type='checkbox' name='%s', value='%i' %s>%s<br>\n";
+const char HTML_ENTRY_MULTI_END[] PROGMEM =
+" </fieldset></div>\n";
 
 //Template for save button and end of the form with save
-const char HTML_END[] =
+const char HTML_END[] PROGMEM =
 "<div class='zeile'><button type='submit' name='SAVE'>Save</button>\n"
 "<button type='submit' name='RST'>Restart</button></div>\n"
 "</form>\n"
@@ -103,7 +113,7 @@ const char HTML_END[] =
 "</body>\n"
 "</html>\n";
 //Template for save button and end of the form without save
-const char HTML_BUTTON[] =
+const char HTML_BUTTON[] PROGMEM =
 "<button type='submit' name='%s'>%s</button>\n";
 
 WebConfig::WebConfig() {
@@ -118,13 +128,13 @@ void WebConfig::setDescription(String parameter){
 void WebConfig::addDescription(String parameter){
   DeserializationError error;
   const int capacity = JSON_ARRAY_SIZE(MAXVALUES)
-  + MAXVALUES*JSON_OBJECT_SIZE(6);
-  StaticJsonDocument<capacity> doc;
+  + MAXVALUES*JSON_OBJECT_SIZE(8);
+  DynamicJsonDocument doc(capacity);
   char tmp[40];
   error = deserializeJson(doc,parameter);
   if (error ) {
     Serial.println(parameter);
-    Serial.print("JSON: ");
+    Serial.print("JSON AddDescription: ");
     Serial.println(error.c_str());
   } else {
     JsonArray array = doc.as<JsonArray>();
@@ -174,11 +184,19 @@ void WebConfig::addDescription(String parameter){
   }
   _apName = WiFi.macAddress();
   _apName.replace(":","");
-  SPIFFS.begin();
+  if (!SPIFFS.begin()) {
+    SPIFFS.format();
+    SPIFFS.begin();
+  }
 };
 
-void createSimple(char * buf, char * name, char * label, char * type, String value) {
+void createSimple(char * buf, const char * name, const char * label, const char * type, String value) {
   sprintf(buf,HTML_ENTRY_SIMPLE,label,type,value.c_str(),name);
+}
+
+void createTextarea(char * buf, DESCRIPTION descr, String value) {
+  //max = rows min = cols
+  sprintf(buf,HTML_ENTRY_AREA,descr.label,descr.max,descr.min,descr.name, value.c_str());
 }
 
 void createNumber(char * buf, DESCRIPTION descr, String value) {
@@ -217,6 +235,18 @@ void addSelectOption(char * buf, String option, String label, String value) {
   }
 }
 
+void startMulti(char * buf , DESCRIPTION descr) {
+  sprintf(buf,HTML_ENTRY_MULTI_START,descr.label);
+}
+
+void addMultiOption(char * buf, String name, uint8_t option, String label, String value) {
+  if ((value.length() > option) && (value[option] == '1')) {
+    sprintf(buf,HTML_ENTRY_MULTI_OPTION,name.c_str(),option,"checked",label.c_str());
+  } else {
+    sprintf(buf,HTML_ENTRY_MULTI_OPTION,name.c_str(),option,"",label.c_str());
+  }
+}
+
 //***********Different type for ESP32 WebServer and ESP8266WebServer ********
 //both classes have the same functions
 #if defined(ESP32)
@@ -239,35 +269,47 @@ void addSelectOption(char * buf, String option, String label, String value) {
   void WebConfig::handleFormRequest(ESP8266WebServer * server, const char * filename){
 #endif
 //******************** Rest of the function has no difference ***************
+  uint8_t a,v;
+  String val;
   if (server->args() > 0) {
-    if (server->hasArg("apName")) _apName = server->arg("apName");
+    if (server->hasArg(F("apName"))) _apName = server->arg(F("apName"));
     for (uint8_t i= 0; i < _count; i++) {
       if (_description[i].type == INPUTCHECKBOX) {
         values[i] = "0";
         if (server->hasArg(_description[i].name)) values[i] = "1";
+      }  else if (_description[i].type == INPUTMULTICHECK) {
+        values[i]="";
+        for (a=0; a<_description[i].optionCnt; a++) values[i] += "0"; //clear result
+        for (a=0; a< server->args(); a++) {
+          if (server->argName(a) == _description[i].name) {
+            val = server->arg(a);
+            v= val.toInt();
+            values[i].setCharAt(v,'1');
+          }
+        }
       } else {
         if (server->hasArg(_description[i].name)) values[i] = server->arg(_description[i].name) ;
       }
     }
-    if (server->hasArg("SAVE") || server->hasArg("RST")) {
+    if (server->hasArg(F("SAVE")) || server->hasArg(F("RST"))) {
       writeConfig(filename);
-      if (server->hasArg("RST")) ESP.restart();
+      if (server->hasArg(F("RST"))) ESP.restart();
     }
   }
   boolean exit = false;
-  if (server->hasArg("SAVE") && _onSave) {
+  if (server->hasArg(F("SAVE")) && _onSave) {
     _onSave(getResults());
     exit = true;
   }
-  if (server->hasArg("DONE") && _onDone) {
+  if (server->hasArg(F("DONE")) && _onDone) {
     _onDone(getResults());
     exit = true;
   }
-  if (server->hasArg("CANCEL") && _onCancel) {
+  if (server->hasArg(F("CANCEL")) && _onCancel) {
     _onCancel();
     exit = true;
   }
-  if (server->hasArg("DELETE") && _onDelete) {
+  if (server->hasArg(F("DELETE")) && _onDelete) {
     _onDelete(_apName);
     exit = true;
   }
@@ -285,6 +327,8 @@ void addSelectOption(char * buf, String option, String label, String value) {
         case INPUTFLOAT:
         case INPUTTEXT: createSimple(_buf,_description[i].name,_description[i].label,"text",values[i]);
           break;
+        case INPUTTEXTAREA: createTextarea(_buf,_description[i],values[i]);
+            break;
         case INPUTPASSWORD: createSimple(_buf,_description[i].name,_description[i].label,"password",values[i]);
           break;
         case INPUTDATE: createSimple(_buf,_description[i].name,_description[i].label,"date",values[i]);
@@ -311,7 +355,15 @@ void addSelectOption(char * buf, String option, String label, String value) {
             addSelectOption(_buf,_description[i].options[j],_description[i].labels[j],values[i]);
           }
           server->sendContent(_buf);
-          strcpy(_buf,HTML_ENTRY_SELECT_END);
+          strcpy_P(_buf,HTML_ENTRY_SELECT_END);
+          break;
+        case INPUTMULTICHECK: startMulti(_buf,_description[i]);
+          for (uint8_t j = 0 ; j<_description[i].optionCnt; j++) {
+            server->sendContent(_buf);
+            addMultiOption(_buf,_description[i].name,j,_description[i].labels[j],values[i]);
+          }
+          server->sendContent(_buf);
+          strcpy_P(_buf,HTML_ENTRY_MULTI_END);
           break;
         default : _buf[0] = 0;
           break;
@@ -358,7 +410,7 @@ boolean WebConfig::readConfig(const char * filename){
   }
   File f = SPIFFS.open(filename,"r");
   if (f) {
-    Serial.println("Read configuration");
+    Serial.println(F("Read configuration"));
     uint32_t size = f.size();
     while (f.position() < size) {
       line = f.readStringUntil(10);
@@ -371,6 +423,7 @@ boolean WebConfig::readConfig(const char * filename){
       } else {
         index = getIndex(name.c_str());
         if (!(index < 0)) {
+          value.replace("~","\n");
           values[index] = value;
           if (_description[index].type == INPUTPASSWORD) {
             Serial.printf("%s=*************\n",_description[index].name);
@@ -383,7 +436,7 @@ boolean WebConfig::readConfig(const char * filename){
     f.close();
     return true;
   } else {
-    Serial.println("Cannot read configuration");
+    Serial.println(F("Cannot read configuration"));
     return false;
   }
 }
@@ -393,15 +446,18 @@ boolean WebConfig::readConfig(){
 }
 //write configuration to file
 boolean WebConfig::writeConfig(const char * filename){
+  String val;
   File f = SPIFFS.open(filename,"w");
   if (f) {
     f.printf("apName=%s\n",_apName.c_str());
     for (uint8_t i = 0; i<_count; i++){
-      f.printf("%s=%s\n",_description[i].name,values[i].c_str());
+      val = values[i];
+      val.replace("\n","~");
+      f.printf("%s=%s\n",_description[i].name,val.c_str());
     }
     return true;
   } else {
-    Serial.println("Cannot write configuration");
+    Serial.println(F("Cannot write configuration"));
     return false;
   }
 
@@ -502,15 +558,15 @@ const char * WebConfig::getValue(const char * name){
   }
 }
 
-const int WebConfig::getInt(const char * name){
+int WebConfig::getInt(const char * name){
   return getString(name).toInt();
 }
 
-const float WebConfig::getFloat(const char * name){
+float WebConfig::getFloat(const char * name){
   return getString(name).toFloat();
 }
 
-const boolean WebConfig::getBool(const char * name){
+boolean WebConfig::getBool(const char * name){
   return (getString(name) != "0");
 }
 

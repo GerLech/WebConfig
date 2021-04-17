@@ -1,7 +1,7 @@
 /*
 
 File WebConfig.h
-Version 1.3.2
+Version 1.4
 Author Gerald Lechner
 contakt lechge@gmail.com
 
@@ -50,8 +50,10 @@ Dependencies:
 #define INPUTSELECT 8
 #define INPUTCOLOR 9
 #define INPUTFLOAT 10
+#define INPUTTEXTAREA 11
+#define INPUTMULTICHECK 12
 //number of types
-#define INPUTTYPES 11
+#define INPUTTYPES 13
 
 #define BTN_CONFIG 0
 #define BTN_DONE 1
@@ -108,9 +110,9 @@ public:
   //get a parameter value by its name
   const String getString(const char * name);
   const char * getValue(const char * name);
-  const int getInt(const char * name);
-  const float getFloat(const char * name);
-  const boolean getBool(const char * name);
+  int getInt(const char * name);
+  float getFloat(const char * name);
+  boolean getBool(const char * name);
   //get the accesspoint name
   const char * getApName();
   //get the number of parameters
