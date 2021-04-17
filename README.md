@@ -31,7 +31,7 @@ Type of HTML input fields
 - INPUTFLOAT 10     Floatingpoint number
 - INPUTTEXTAREA 11  Text area with multiple lines
 - INPUTMULTICHECK 12 Fieldset with multiple checkboxes. The result string has one character
-0 or 1 for every option. 010010 means there are 6 options and option 2 nand 5 are true
+0 or 1 for every option. 010010 means there are 6 options and option 2 and 5 are true
 
 ## Functions
 
