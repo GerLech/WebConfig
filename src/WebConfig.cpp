@@ -468,7 +468,7 @@ boolean WebConfig::writeConfig(){
 }
 //delete configuration file
 boolean WebConfig::deleteConfig(const char * filename){
-  return remove(filename);
+  return SPIFFS.remove(filename);
 }
 //delete default configutation file
 boolean WebConfig::deleteConfig(){
